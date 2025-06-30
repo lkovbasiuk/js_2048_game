@@ -15,7 +15,7 @@ function renderBoard() {
 
       const index = i * 4 + y;
 
-      cells[index].textContent = (value === 0 || isNaN(value)) ? '' : value;
+      cells[index].textContent = value === 0 || isNaN(value) ? '' : value;
       cells[index].className = 'field-cell';
 
       if (value !== 0) {

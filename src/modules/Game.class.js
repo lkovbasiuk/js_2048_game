@@ -58,7 +58,7 @@ class Game {
   }
 
   moveUp() {
-    let columns = [];
+    const columns = [];
 
     for (let j = 0; j < 4; j++) {
       const col = [];
@@ -85,7 +85,7 @@ class Game {
   }
 
   moveDown() {
-    let columns = [];
+    const columns = [];
 
     for (let j = 0; j < 4; j++) {
       const col = [];
@@ -234,7 +234,9 @@ class Game {
         }
       }
 
-      for (let x = 0; x < 4 - notZeroArray.length; x++) {
+      const notZeroLength = notZeroArray.length;
+
+      for (let x = 0; x < 4 - notZeroLength; x++) {
         if (direction === 'left' || direction === 'up') {
           notZeroArray.push(0);
         }
