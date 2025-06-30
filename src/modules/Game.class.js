@@ -21,7 +21,7 @@ class Game {
    * initial state.
    */
   constructor(initialState) {
-    this.board = [
+    this.board = initialState ?? [
       [0, 0, 0, 0],
       [0, 0, 0, 0],
       [0, 0, 0, 0],
@@ -34,19 +34,27 @@ class Game {
   }
 
   moveLeft() {
-    this.board = this.compressBoard(this.board, 'left');
+    const newBoard = this.board.map((row) => [...row]);
+    const compressed = this.compressBoard(newBoard, 'left');
 
-    this.mergeCells(this.board, 'left');
+    this.mergeCells(compressed, 'left');
 
-    this.board = this.compressBoard(this.board, 'left');
+    const finalCompressed = this.compressBoard(compressed, 'left');
+
+    this.board = finalCompressed;
+    this.status = this.getStatus();
   }
 
   moveRight() {
-    this.board = this.compressBoard(this.board, 'right');
+    const newBoard = this.board.map((row) => [...row]);
+    const compressed = this.compressBoard(newBoard, 'right');
 
-    this.mergeCells(this.board, 'right');
+    this.mergeCells(compressed, 'right');
 
-    this.board = this.compressBoard(this.board, 'right');
+    const finalCompressed = this.compressBoard(compressed, 'right');
+
+    this.board = finalCompressed;
+    this.status = this.getStatus();
   }
 
   moveUp() {
@@ -61,17 +69,19 @@ class Game {
       columns.push(col);
     }
 
-    columns = this.compressBoard(columns, 'up');
+    const compressed = this.compressBoard(columns, 'up');
 
-    this.mergeCells(columns, 'up');
+    this.mergeCells(compressed, 'up');
 
-    columns = this.compressBoard(columns, 'up');
+    const finalCompressed = this.compressBoard(compressed, 'up');
 
-    for (let j = 0; j < 4; j++) {
-      for (let i = 0; i < 4; i++) {
-        this.board[i][j] = columns[j][i];
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        this.board[i][j] = finalCompressed[j][i];
       }
     }
+
+    this.status = this.getStatus();
   }
 
   moveDown() {
@@ -86,17 +96,19 @@ class Game {
       columns.push(col);
     }
 
-    columns = this.compressBoard(columns, 'down');
+    const compressed = this.compressBoard(columns, 'down');
 
-    this.mergeCells(columns, 'down');
+    this.mergeCells(compressed, 'down');
 
-    columns = this.compressBoard(columns, 'down');
+    const finalCompressed = this.compressBoard(compressed, 'down');
 
-    for (let j = 0; j < 4; j++) {
-      for (let i = 0; i < 4; i++) {
-        this.board[i][j] = columns[j][i];
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        this.board[i][j] = finalCompressed[j][i];
       }
     }
+
+    this.status = this.getStatus();
   }
 
   /**
@@ -190,7 +202,7 @@ class Game {
 
     for (let i = 0; i < this.board.length; i++) {
       for (let y = 0; y < this.board[i].length; y++) {
-        if (this.board[i][y] === 0) {
+        if (!Number.isFinite(this.board[i][y]) || this.board[i][y] === 0) {
           coords.push([i, y]);
         }
       }
@@ -242,10 +254,13 @@ class Game {
     for (let i = 0; i < board.length; i++) {
       if (direction === 'left' || direction === 'up') {
         for (let y = 0; y < board[i].length - 1; y++) {
-          if (board[i][y] === board[i][y + 1]) {
-            this.score += board[i][y] + board[i][y + 1];
-            board[i][y] += board[i][y + 1];
+          const current = board[i][y];
+          const next = board[i][y + 1];
+
+          if (Number.isFinite(current) && current === next) {
+            board[i][y] += next;
             board[i][y + 1] = 0;
+            this.score += board[i][y];
             y++;
           }
         }
@@ -253,10 +268,13 @@ class Game {
 
       if (direction === 'right' || direction === 'down') {
         for (let y = board[i].length - 1; y > 0; y--) {
-          if (board[i][y] === board[i][y - 1]) {
-            this.score += board[i][y] + board[i][y - 1];
-            board[i][y] += board[i][y - 1];
+          const current = board[i][y];
+          const prev = board[i][y - 1];
+
+          if (Number.isFinite(current) && current === prev) {
+            board[i][y] += prev;
             board[i][y - 1] = 0;
+            this.score += board[i][y];
             y--;
           }
         }
